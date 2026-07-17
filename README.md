@@ -22,8 +22,8 @@ Deteksi otomatis **orang**, **kursi**, dan **meja** dari foto/video coffeeshop m
 ## 🚀 Quickstart
 
 ```bash
-git clone https://github.com/rizqy-fadhil/NAMA-REPO.git
-cd NAMA-REPO
+git clone https://github.com/rizqy-fadhil/Coffeeshop-Seat-Table-Detector.git
+cd Coffeeshop-Seat-Table-Detector
 
 python -m venv venv
 venv\Scripts\activate        # Windows
