@@ -1,0 +1,18 @@
+# Virtual environment
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Model weights (biar repo nggak berat, auto-download pas dijalankan)
+*.pt
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
+
+# Streamlit
+.streamlit/secrets.toml
