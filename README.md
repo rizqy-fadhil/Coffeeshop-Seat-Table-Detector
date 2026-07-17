@@ -9,7 +9,7 @@ Deteksi otomatis **orang**, **kursi**, dan **meja** dari foto/video coffeeshop m
 ## 📸 Preview
 
 <!-- Ganti dengan screenshot hasil deteksi kamu -->
-![demo](docs/demo.png)
+![demo](demo/demo.png)
 
 ## ✨ Fitur
 
