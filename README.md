@@ -1,80 +1,68 @@
 # ☕ Coffeeshop Seat & Table Detector
 
-Aplikasi Streamlit untuk mendeteksi **orang**, **kursi**, dan **meja** dari foto/video
-coffeeshop menggunakan model **YOLOv8 pretrained COCO**, sebagai fondasi untuk fitur
-deteksi ketersediaan kursi (seat occupancy detection).
+Deteksi otomatis **orang**, **kursi**, dan **meja** dari foto/video coffeeshop menggunakan **YOLOv8** (pretrained COCO) + **Streamlit**. Dibuat sebagai fondasi untuk sistem deteksi ketersediaan kursi (seat occupancy) di coffeeshop secara real-time.
+
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![Streamlit](https://img.shields.io/badge/streamlit-app-red)
+![YOLOv8](https://img.shields.io/badge/YOLOv8-ultralytics-orange)
+
+## 📸 Preview
+
+<!-- Ganti dengan screenshot hasil deteksi kamu -->
+![demo](docs/demo.png)
+
+## ✨ Fitur
+
+- Upload foto atau video coffeeshop langsung dari browser
+- Deteksi `person`, `chair`, `dining table` pakai model YOLOv8 pretrained
+- Estimasi status kursi (`occupied` / `empty`) berdasarkan posisi orang di sekitar kursi
+- Pilihan ukuran model (nano/small/medium) dan threshold yang bisa diatur dari sidebar
+- Ringkasan jumlah orang, kursi terisi, dan kursi kosong secara otomatis
+
+## 🚀 Quickstart
+
+```bash
+git clone https://github.com/rizqy-fadhil/NAMA-REPO.git
+cd NAMA-REPO
+
+python -m venv venv
+venv\Scripts\activate        # Windows
+# source venv/bin/activate   # Mac/Linux
+
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+Buka `http://localhost:8501` di browser, upload foto/video coffeeshop, lihat hasilnya.
+
+> Catatan: model YOLOv8 (`yolov8n.pt` dkk) akan otomatis terdownload saat pertama kali dijalankan.
 
 ## 📁 Struktur Folder
 
 ```
 seat-detector/
-├── app.py                  # Aplikasi utama Streamlit (jalankan ini)
-├── requirements.txt        # Daftar dependency
-├── README.md                # Dokumentasi ini
-├── models/                 # Tempat menyimpan file model .pt (opsional)
-│   └── (kosong, model akan auto-download ke sini/cache Ultralytics)
+├── app.py
+├── requirements.txt
 ├── utils/
-│   ├── __init__.py
-│   ├── detector.py          # Wrapper YOLOv8: load model, predict, gambar bounding box
-│   └── occupancy.py         # Logic overlap person-chair -> status occupied/empty
-└── sample_data/             # Taruh foto/video contoh coffeeshop kamu di sini (opsional)
+│   ├── detector.py
+│   └── occupancy.py
+├── models/
+└── sample_data/
 ```
-
-## 🚀 Cara Menjalankan
-
-1. Buat virtual environment (opsional tapi disarankan):
-   ```bash
-   python -m venv venv
-   source venv/bin/activate      # Windows: venv\Scripts\activate
-   ```
-
-2. Install dependency:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. Jalankan aplikasi:
-   ```bash
-   streamlit run app.py
-   ```
-
-4. Browser otomatis terbuka di `http://localhost:8501`.
-   - Tab **Foto**: upload gambar coffeeshop, hasil deteksi + ringkasan langsung muncul.
-   - Tab **Video**: upload video, klik "Mulai Proses Video", hasil deteksi diproses
-     frame-per-frame dan ditampilkan live.
-
-> Catatan: saat pertama kali dijalankan, Ultralytics akan otomatis mendownload
-> file model (`yolov8n.pt` dkk) dari internet. Pastikan ada koneksi internet
-> di run pertama. Setelah itu, model tersimpan di cache lokal.
 
 ## 🧠 Cara Kerja
 
-1. **Deteksi objek** — `utils/detector.py` memuat model YOLOv8 yang sudah
-   di-pretrain di dataset COCO (80 kelas umum, termasuk `person`, `chair`,
-   `dining table`). Kita filter supaya hanya 3 kelas ini yang ditampilkan.
+1. Model YOLOv8 pretrained COCO mendeteksi objek `person`, `chair`, `dining table`
+2. Status kursi dihitung dari overlap (IoU) antara bounding box orang dan kursi
+3. Semua parameter bisa diatur langsung dari sidebar Streamlit
 
-2. **Status kursi** — `utils/occupancy.py` menghitung *Intersection-over-Union*
-   (IoU) antara bounding box tiap kursi dengan bounding box orang di sekitarnya.
-   Kalau overlap-nya melebihi threshold tertentu, kursi dianggap `occupied`;
-   kalau tidak, dianggap `empty`.
+## 🔧 Roadmap / Pengembangan Lanjutan
 
-3. Semua parameter (model size, confidence threshold, overlap threshold,
-   kelas yang ditampilkan) bisa diatur langsung dari sidebar Streamlit.
+- [ ] Perbaiki logic occupancy untuk sudut kamera CCTV (bukan cuma overlap box)
+- [ ] Fine-tuning model dengan dataset coffeeshop asli
+- [ ] Dukungan RTSP live stream dari CCTV
+- [ ] Zona kursi tetap (ROI) untuk kamera statis
 
-## 🔧 Pengembangan Lanjutan
+## 📄 Lisensi
 
-- **Fine-tuning**: kalau akurasi kurang bagus di kondisi coffeeshop tertentu
-  (pencahayaan redup, sudut kamera ekstrem, kursi tertutup meja), kumpulkan
-  data foto/video dari coffeeshop asli, beri label pakai
-  [Roboflow](https://roboflow.com) atau [CVAT](https://cvat.ai), lalu
-  fine-tune model YOLOv8 dengan `model.train(data="dataset.yaml", ...)`.
-
-- **Zona kursi tetap (ROI)**: untuk kamera CCTV yang posisinya statis, kamu
-  bisa menandai koordinat tiap kursi secara manual sekali saja (bukan deteksi
-  otomatis tiap frame), lalu cukup cek apakah ada bounding box `person` yang
-  masuk ke zona tersebut. Ini lebih stabil dibanding deteksi kursi otomatis
-  yang bisa berubah-ubah tiap frame karena oklusi.
-
-- **Multi-kamera / RTSP live stream**: `detector.predict()` bisa menerima
-  input dari `cv2.VideoCapture("rtsp://...")` untuk pipeline real-time,
-  bukan cuma file upload.
+MIT — bebas dipakai, dimodifikasi, dan disebarluaskan.
